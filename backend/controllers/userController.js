@@ -1,21 +1,47 @@
-const User = require("../models/User");
-
-exports.addTask = async (req, res) => {
+exports.addTask = async (req, res, pool) => {
   const { email, title } = req.body;
-  let user = await User.findOne({ email });
-  if (!user) {
-    user = new User({ email, tasks: [] });
+  try {
+    const userQuery = "SELECT id FROM users WHERE email = $1";
+    const userResult = await pool.query(userQuery, [email]);
+    let userId;
+
+    if (userResult.rows.length === 0) {
+      const insertUserQuery =
+        "INSERT INTO users (email) VALUES ($1) RETURNING id";
+      const newUserResult = await pool.query(insertUserQuery, [email]);
+      userId = newUserResult.rows[0].id;
+    } else {
+      userId = userResult.rows[0].id;
+    }
+
+    const insertTaskQuery =
+      "INSERT INTO tasks (user_id, title, completed) VALUES ($1, $2, $3) RETURNING *";
+    const taskResult = await pool.query(insertTaskQuery, [
+      userId,
+      title,
+      false,
+    ]);
+    res.send(taskResult.rows[0]);
+  } catch (err) {
+    res.status(500).send({ error: "Database error" });
   }
-  user.tasks.push({ title, completed: false });
-  await user.save();
-  res.send(user);
 };
 
-exports.getTasks = async (req, res) => {
+exports.getTasks = async (req, res, pool) => {
   const { email } = req.query;
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(404).send({ message: "User not found" });
+  try {
+    const userQuery = "SELECT id FROM users WHERE email = $1";
+    const userResult = await pool.query(userQuery, [email]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const userId = userResult.rows[0].id;
+    const tasksQuery = "SELECT * FROM tasks WHERE user_id = $1";
+    const tasksResult = await pool.query(tasksQuery, [userId]);
+    res.send(tasksResult.rows);
+  } catch (err) {
+    res.status(500).send({ error: "Database error" });
   }
-  res.send(user.tasks);
 };

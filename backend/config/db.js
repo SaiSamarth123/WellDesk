@@ -1,3 +1,7 @@
 module.exports = {
-  url: "mongodb://localhost:27017/welldesk",
+  user: "your_db_user",
+  host: "localhost",
+  database: "welldesk",
+  password: "your_db_password",
+  port: 5432,
 };

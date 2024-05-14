@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        width: 320px;
+        font-family: Arial, sans-serif;
+        padding: 10px;
+        background-color: #f4f4f9;
+        color: #333;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #4caf50;
+      }
+      input,
+      select {
+        width: calc(100% - 24px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        border: none;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        padding: 10px;
+        background: #fff;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .timer {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .timer-display {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+      .timer-buttons button {
+        width: calc(50% - 5px);
+        margin: 5px 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welldesk</h1>
+    <input type="text" id="taskInput" placeholder="New Task" />
+    <button id="addTaskButton">Add Task</button>
+    <ul id="taskList"></ul>
+    <div class="timer">
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <input
+        type="number"
+        id="pomodoroMinutes"
+        placeholder="Pomodoro minutes"
+        value="25"
+        min="1"
+      />
+      <div class="timer-buttons">
+        <button id="startTimerButton">Start</button>
+        <button id="resetTimerButton">Reset</button>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

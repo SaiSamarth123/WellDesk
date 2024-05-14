@@ -1,18 +1,20 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
+const { Pool } = require("pg");
 const apiRoutes = require("./routes/api");
 const dbConfig = require("./config/db");
 
 const app = express();
 
-mongoose.connect(dbConfig.url, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const pool = new Pool(dbConfig);
+
+// mongoose.connect(dbConfig.url, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
 
 app.use(bodyParser.json());
 app.use("/api", apiRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
