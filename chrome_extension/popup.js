@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const taskInput = document.getElementById("taskInput");
   const taskList = document.getElementById("taskList");
   const addTaskButton = document.getElementById("addTaskButton");
+  const clearTasksButton = document.getElementById("clearTasksButton");
   const timerDisplay = document.getElementById("timerDisplay");
   const startTimerButton = document.getElementById("startTimerButton");
   const resetTimerButton = document.getElementById("resetTimerButton");
@@ -16,10 +17,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (task) {
       chrome.storage.sync.get(["tasks"], function (result) {
         const tasks = result.tasks || [];
-        tasks.push({ title: task, completed: false });
-        prioritizeTasks(tasks);
+        fetchTaskData(task).then((taskData) => {
+          tasks.push(taskData);
+          prioritizeTasks(tasks);
+        });
       });
     }
+  });
+
+  clearTasksButton.addEventListener("click", function () {
+    chrome.storage.sync.set({ tasks: [] }, function () {
+      renderTasks([]);
+    });
   });
 
   function renderTasks(tasks) {
@@ -28,6 +37,24 @@ document.addEventListener("DOMContentLoaded", function () {
       const taskItem = document.createElement("li");
       taskItem.textContent = `${task.title} (Priority: ${task.priority}, Time: ${task.time_estimate} mins)`;
       taskList.appendChild(taskItem);
+    });
+  }
+
+  function fetchTaskData(task) {
+    return new Promise((resolve, reject) => {
+      fetch(
+        `https://api.example.com/taskinfo?query=${encodeURIComponent(task)}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          const taskData = {
+            title: task,
+            priority: data.priority || 3, // Default priority if not available
+            time_estimate: data.time_estimate || 25, // Default time estimate if not available
+          };
+          resolve(taskData);
+        })
+        .catch((error) => reject(error));
     });
   }
 
